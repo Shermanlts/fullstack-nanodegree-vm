@@ -25,11 +25,11 @@ CREATE TABLE players (
 --Create Standings table
 --Opponent match wins is omw
 CREATE TABLE standings (
-	id serial references players,
-	rank integer,
-	wins integer,
-	losses integer,
-	omw integer
+	id integer references players,
+	rank integer default 0,
+	wins integer default 0,
+	matches integer default 0,
+	omw integer default 0
 	);
 
 --Create matches table
