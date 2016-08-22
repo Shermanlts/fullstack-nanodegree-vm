@@ -6,8 +6,15 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+--clears any previous database if needed
+\c vagrant
+DROP DATABASE tournament;
+
 -- Create the database
-CREATE DATABASE  tournament
+CREATE DATABASE tournament;
+
+--Move into database
+\c tournament
 
 --Create players table
 CREATE TABLE players (
