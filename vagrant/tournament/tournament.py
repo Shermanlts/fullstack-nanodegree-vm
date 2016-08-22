@@ -16,8 +16,10 @@ def deleteMatches():
     DB= connect()
     c = DB.cursor()
     c.execute("DELETE from matches")
+    c.execute("UPDATE standings SET wins=0, matches = 0")
     DB.commit()
     DB.close()
+
 
 
 def deletePlayers():
@@ -54,7 +56,7 @@ def registerPlayer(name):
     c = DB.cursor()
     c.execute("INSERT into players(name) values (%s)", (bleach.clean(name),))
     DB.commit()
-    c.execute("Select id from players order by id desc")
+    c.execute("SELECT id from players order by id desc")
     latest = c.fetchone()[0]
     c.fetchall()
     c.execute("INSERT into standings(id) values (%s)", (latest,))
@@ -75,7 +77,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    
+    DB = connect()
+    c = DB.cursor()
+    c.execute("SELECT players.id, players.name, standings.wins, standings.matches from players join standings on players.id = standings.id order by wins desc, omw desc")
+    rows = c.fetchall()
+    return rows
+    DB.close()
 
 
 def reportMatch(winner, loser):
@@ -85,6 +92,13 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    DB = connect()
+    c = DB.cursor()
+    c.execute("INSERT into matches(winner,loser) values (%s,%s)" %(winner, loser))
+    c.execute("UPDATE standings SET wins = (wins+1) where id =%s" % winner)
+    c.execute("UPDATE Standings SET matches = (matches+1) where (id = %s) or (id= %s)" % (winner, loser))
+    DB.commit()
+    DB.close()
  
  
 def swissPairings():
@@ -102,5 +116,4 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-countPlayers()
 
