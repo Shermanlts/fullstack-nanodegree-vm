@@ -36,6 +36,5 @@ CREATE TABLE standings (
 CREATE TABLE matches (
 	id serial primary key,
 	winner integer references players,
-	loser integer references players,
-	round integer
+	loser integer references players
 	);
