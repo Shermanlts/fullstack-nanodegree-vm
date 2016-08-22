@@ -24,6 +24,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     DB= connect()
     c = DB.cursor()
+    c.execute("DELETE from standings")
     c.execute("DELETE from players")
     DB.commit()
     DB.close()
@@ -53,6 +54,11 @@ def registerPlayer(name):
     c = DB.cursor()
     c.execute("INSERT into players(name) values (%s)", (bleach.clean(name),))
     DB.commit()
+    c.execute("Select id from players order by id desc")
+    latest = c.fetchone()[0]
+    c.fetchall()
+    c.execute("INSERT into standings(id) values (%s)", (latest,))
+    DB.commit()
     DB.close()
 
 
@@ -69,6 +75,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    
 
 
 def reportMatch(winner, loser):
