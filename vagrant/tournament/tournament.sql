@@ -26,10 +26,8 @@ CREATE TABLE players (
 --Opponent match wins is omw
 CREATE TABLE standings (
 	id integer references players,
-	rank integer default 0,
 	wins integer default 0,
-	matches integer default 0,
-	omw integer default 0
+	matches integer default 0
 	);
 
 --Create matches table
