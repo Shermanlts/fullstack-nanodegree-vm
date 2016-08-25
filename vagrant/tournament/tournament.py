@@ -4,7 +4,6 @@
 #
 
 import psycopg2
-import bleach
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -55,14 +54,16 @@ def registerPlayer(name):
     """
     DB= connect()
     c = DB.cursor()
+    SQL = "INSERT into players(name) values (%s);"
     # Inserts players name and checks against SQL attacks
-    c.execute("INSERT into players(name) values (%s)", (bleach.clean(name),))
+    c.execute(SQL,(name,))
     DB.commit()
     # Gets the latest id(generated) and add that player to the standings table
     c.execute("SELECT id from players order by id desc")
     latest = c.fetchone()[0]
     c.fetchall()
-    c.execute("INSERT into standings(id) values (%s)", (latest,))
+    SQL2 = "INSERT into standings(id) values (%s);"
+    c.execute(SQL2,(latest,))
     DB.commit()
     DB.close()
 
@@ -98,9 +99,9 @@ def reportMatch(winner, loser):
     DB = connect()
     c = DB.cursor()
     # Adds data to matches and then updates the standings table with that data
-    c.execute("INSERT into matches(winner,loser) values (%s,%s)" %(winner, loser))
-    c.execute("UPDATE standings SET wins = (wins+1) where id =%s" % winner)
-    c.execute("UPDATE Standings SET matches = (matches+1) where (id = %s) or (id= %s)" % (winner, loser))
+    c.execute("INSERT into matches(winner,loser) values (%s,%s)", (winner, loser))
+    c.execute("UPDATE standings SET wins = (wins+1) where id =%s" % (winner,))
+    c.execute("UPDATE Standings SET matches = (matches+1) where (id = %s) or (id= %s)", (winner, loser))
     DB.commit()
     DB.close()
  
