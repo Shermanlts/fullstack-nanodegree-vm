@@ -15,8 +15,6 @@ def deleteMatches():
     DB= connect()
     c = DB.cursor()
     c.execute("DELETE from matches")
-    # Removes all standings when matches are deleted
-    c.execute("UPDATE standings SET wins=0, matches = 0")
     DB.commit()
     DB.close()
 
@@ -26,7 +24,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     DB= connect()
     c = DB.cursor()
-    c.execute("DELETE from standings")
+    c.execute("DELETE from matches")
     c.execute("DELETE from players")
     DB.commit()
     DB.close()
@@ -58,13 +56,6 @@ def registerPlayer(name):
     # Inserts players name and checks against SQL attacks
     c.execute(SQL,(name,))
     DB.commit()
-    # Gets the latest id(generated) and add that player to the standings table
-    c.execute("SELECT id from players order by id desc")
-    latest = c.fetchone()[0]
-    c.fetchall()
-    SQL2 = "INSERT into standings(id) values (%s);"
-    c.execute(SQL2,(latest,))
-    DB.commit()
     DB.close()
 
 
@@ -83,7 +74,7 @@ def playerStandings():
     """
     DB = connect()
     c = DB.cursor()
-    c.execute("SELECT players.id, players.name, standings.wins, standings.matches from players join standings on players.id = standings.id order by wins desc")
+    c.execute("SELECT id, name, wins, matches from standings")
     rows = c.fetchall()
     return rows
     DB.close()
@@ -100,8 +91,6 @@ def reportMatch(winner, loser):
     c = DB.cursor()
     # Adds data to matches and then updates the standings table with that data
     c.execute("INSERT into matches(winner,loser) values (%s,%s)", (winner, loser))
-    c.execute("UPDATE standings SET wins = (wins+1) where id =%s" % (winner,))
-    c.execute("UPDATE Standings SET matches = (matches+1) where (id = %s) or (id= %s)", (winner, loser))
     DB.commit()
     DB.close()
  
@@ -123,7 +112,7 @@ def swissPairings():
     """
     DB = connect()
     c = DB.cursor()
-    c.execute("SELECT standings.id, players.name from players join standings on players.id=standings.id order by wins desc")
+    c.execute("SELECT id, name from standings")
     pairings = []
     i = 0
     rows = c.fetchall()
