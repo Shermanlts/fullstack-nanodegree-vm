@@ -26,6 +26,14 @@ CREATE TABLE players (
 --Create matches table
 CREATE TABLE matches (
 	id serial primary key,
-	winner integer references players,
-	loser integer references players
+	winner integer references players(id),
+	loser integer references players(id)
 	);
+
+CREATE VIEW standings AS 
+	SELECT players.id, players.name, 
+	(SELECT count(*) from matches where players.id = matches.winner) as wins,
+	(SELECT count(*) from matches where players.id = matches.winner or players.id = matches.loser) as matches
+	from players left join matches 
+	ON players.id = matches.winner 
+	GROUP BY players.id order by wins desc
